@@ -1,0 +1,1402 @@
+{
+	"info": {
+		"_postman_id": "acd5f241-8376-4b8e-9d45-ba9bee70f54d",
+		"name": "DigitalMedia",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "18046022"
+	},
+	"item": [
+		{
+			"name": "autenticacion",
+			"item": [
+				{
+					"name": "1. GET Open ID Config",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Setear Tokens\", () => {",
+									"    const jsonData = pm.response.json();",
+									"    pm.collectionVariables.set(\"TOKEN_ENDPOINT\", jsonData.token_endpoint);",
+									"    pm.collectionVariables.set(\"AUTHORIZATION_ENDPOINT\", jsonData.authorization_endpoint);",
+									"    pm.collectionVariables.set(\"TOKEN_INSTROSPECTION_ENDPOINT\", jsonData.introspection_endpoint);",
+									"    pm.collectionVariables.set(\"USER_INFO_ENDPOINT\", jsonData.userinfo_endpoint);",
+									"",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{REALM}}/.well-known/openid-configuration",
+							"host": [
+								"{{REALM}}"
+							],
+							"path": [
+								".well-known",
+								"openid-configuration"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "2. Access Token (Password)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Setear Tokens\", () => {",
+									"    const jsonData = pm.response.json();",
+									"   pm.collectionVariables.set(\"ACCESS_TOKEN\", jsonData.access_token);",
+									"   pm.collectionVariables.set(\"REFRESH_TOKEN\", jsonData.refresh_token);",
+									"   pm.collectionVariables.set(\"TOKEN_TYPE\", jsonData.token_type);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "{{CLIENT_ID}}",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "{{CLIENT_SECRET_INTERNAL}}",
+									"type": "text"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "{{FACTURACION_SERVICE}}{{REDIRECT_URI}}",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "{{USERNAME}}",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "{{PASSWORD}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{TOKEN_ENDPOINT}}",
+							"host": [
+								"{{TOKEN_ENDPOINT}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Authorization Endpoint (GET code)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8082/realms/DigitalMedia/protocol/openid-connect/auth?client_id=api-gateway&response_type=code&redirect_uri=http://localhost:8080/login/oauth2/code/keycloak&scope=openid",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8082",
+							"path": [
+								"realms",
+								"DigitalMedia",
+								"protocol",
+								"openid-connect",
+								"auth"
+							],
+							"query": [
+								{
+									"key": "client_id",
+									"value": "api-gateway"
+								},
+								{
+									"key": "response_type",
+									"value": "code"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "http://localhost:8080/login/oauth2/code/keycloak"
+								},
+								{
+									"key": "scope",
+									"value": "openid"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Access Token (Code)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Setear Tokens\", () => {",
+									"    const jsonData = pm.response.json();",
+									"   pm.collectionVariables.set(\"ACCESS_TOKEN\", jsonData.access_token);",
+									"   pm.collectionVariables.set(\"REFRESH_TOKEN\", jsonData.refresh_token);",
+									"   pm.collectionVariables.set(\"TOKEN_TYPE\", jsonData.token_type);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "authorization_code",
+									"type": "text"
+								},
+								{
+									"key": "code",
+									"value": "{{CODE}}",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "{{CLIENT_ID}}",
+									"type": "text"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "{{GATEWAY_SERVICE}}{{REDIRECT_URI}}",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "{{CLIENT_SECRET_GATEWAY}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{TOKEN_ENDPOINT}}",
+							"host": [
+								"{{TOKEN_ENDPOINT}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "grant_type",
+									"value": "refresh_token",
+									"type": "text"
+								},
+								{
+									"key": "refresh_token",
+									"value": "{{REFRESH_TOKEN}}",
+									"type": "text"
+								},
+								{
+									"key": "client_id",
+									"value": "{{CLIENT_ID}}",
+									"type": "text"
+								},
+								{
+									"key": "redirect_uri",
+									"value": "{{FACTURACION_SERVICE}}{{REDIRECT_URI}}",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "{{CLIENT_SECRET_INTERNAL}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{TOKEN_ENDPOINT}}",
+							"host": [
+								"{{TOKEN_ENDPOINT}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Token Introspection",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "{{CLIENT_ID}}",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "{{CLIENT_SECRET_INTERNAL}}",
+									"type": "text"
+								},
+								{
+									"key": "token",
+									"value": "{{ACCESS_TOKEN}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{TOKEN_INSTROSPECTION_ENDPOINT}}",
+							"host": [
+								"{{TOKEN_INSTROSPECTION_ENDPOINT}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "User Info",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{TOKEN_TYPE}} {{ACCESS_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "client_id",
+									"value": "{{CLIENT_ID}}",
+									"type": "text"
+								},
+								{
+									"key": "client_secret",
+									"value": "{{CLIENT_SECRET}}",
+									"type": "text"
+								},
+								{
+									"key": "access_token",
+									"value": "{{ACCESS_TOKEN}}",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{USER_INFO_ENDPOINT}}",
+							"host": [
+								"{{USER_INFO_ENDPOINT}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://localhost:8082/realms/DigitalMedia/protocol/openid-connect/logout",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "8082",
+							"path": [
+								"realms",
+								"DigitalMedia",
+								"protocol",
+								"openid-connect",
+								"logout"
+							],
+							"query": [
+								{
+									"key": "id_token",
+									"value": "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJTYVZMSzVOTjNEclE1TEVNQzR3Uk1jMjBXVE1uQXlNaVI0Vmo4WnBneXdBIn0.eyJleHAiOjE2NjY3Mjc0ODEsImlhdCI6MTY2NjcyNzE4MSwiYXV0aF90aW1lIjoxNjY2NzI0NDcyLCJqdGkiOiI3YzgxNjQ4NS0xMTIwLTQwYWMtYTVkZS03OWY3MDQ0OWVkNjAiLCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwODUvcmVhbG1zL2RpZ2l0YWwtaG91c2UiLCJhdWQiOiJvaWRjLXBvc3RtYW4iLCJzdWIiOiI3MzdlM2ZmNi1mMGYyLTQ0YzktYjk5NC0xMzBmNzQ5MjAwNmEiLCJ0eXAiOiJJRCIsImF6cCI6Im9pZGMtcG9zdG1hbiIsInNlc3Npb25fc3RhdGUiOiJkY2FhY2RmMS05YzkxLTRhN2YtYmQyNC1lYTUxNzVkMDZmMDIiLCJhdF9oYXNoIjoibjN0c290Nmd6c01EbXdEUzRTTnE2ZyIsImFjciI6IjAiLCJzaWQiOiJkY2FhY2RmMS05YzkxLTRhN2YtYmQyNC1lYTUxNzVkMDZmMDIiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsInByZWZlcnJlZF91c2VybmFtZSI6ImFmaWRhbCIsImVkYWQiOjM4LCJuYWNpb25hbGlkYWQiOiJBcmdlbnRpbmEifQ.BisPlW_TmNKWBQ7u4goOufYvGpD4wtrR9iBlK-J6m5s7xLpkNSIibPGt3PzqLApml0fkQiwGdbuz56WEeaMtlOaCIf7dKZ1LM2Y4FXgDC5XO9EbKVCE4LCBSW-lEoFLj80B08ar1jzDLS1mtoKbOYBFRqE2DyvL80P58yJ3GJpgxTXp-w8QRhfrE1MNa1y8IAL0NRT-BC0pLMuFuzfGQaZUxcdXnKperK1-hrx_wh7jn-Wr3J6HytswWntB4KcWZ2QloqT8G6antXo6e3RYcTgbo-ipXNzLJBeog88uDcOJCeGzcJIqWcefwnTNBgH2sNzhMsiaN2HUdSJzfIPguKQ",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "gateway-service (localhost:8080)",
+			"item": []
+		},
+		{
+			"name": "peliculas-service (localhost:8086)",
+			"item": [
+				{
+					"name": "Actuator",
+					"item": [
+						{
+							"name": "Actuator Info",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{PELICULAS_SERVICE}}/actuator/info",
+									"host": [
+										"{{PELICULAS_SERVICE}}"
+									],
+									"path": [
+										"actuator",
+										"info"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Actuator Health",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{PELICULAS_SERVICE}}/actuator/health",
+									"host": [
+										"{{PELICULAS_SERVICE}}"
+									],
+									"path": [
+										"actuator",
+										"health"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Actuator Metrics",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{PELICULAS_SERVICE}}/actuator/metrics",
+									"host": [
+										"{{PELICULAS_SERVICE}}"
+									],
+									"path": [
+										"actuator",
+										"metrics"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Actuator Env",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{PELICULAS_SERVICE}}/actuator/env",
+									"host": [
+										"{{PELICULAS_SERVICE}}"
+									],
+									"path": [
+										"actuator",
+										"env"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Actuator Beans",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{PELICULAS_SERVICE}}/actuator/beans",
+									"host": [
+										"{{PELICULAS_SERVICE}}"
+									],
+									"path": [
+										"actuator",
+										"beans"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Actuator Mappings",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{PELICULAS_SERVICE}}/actuator/mappings",
+									"host": [
+										"{{PELICULAS_SERVICE}}"
+									],
+									"path": [
+										"actuator",
+										"mappings"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "GET all movies [CLIENT o ADMIN]",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{TOKEN_TYPE}} {{ACCESS_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{PELICULAS_SERVICE}}{{PELICULAS_PATH}}",
+							"host": [
+								"{{PELICULAS_SERVICE}}{{PELICULAS_PATH}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET movie by imdbID [CLIENT o ADMIN]",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{TOKEN_TYPE}} {{ACCESS_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{PELICULAS_SERVICE}}{{PELICULAS_PATH}}/A123",
+							"host": [
+								"{{PELICULAS_SERVICE}}{{PELICULAS_PATH}}"
+							],
+							"path": [
+								"A123"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST comment [CLIENT o ADMIN]",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{TOKEN_TYPE}} {{ACCESS_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \"text\": \"Excelente, me gustó aunque tengo miedo de Casper. ¿Es bueno?\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{PELICULAS_SERVICE}}{{PELICULAS_PATH}}/A123/comments",
+							"host": [
+								"{{PELICULAS_SERVICE}}{{PELICULAS_PATH}}"
+							],
+							"path": [
+								"A123",
+								"comments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST movie [ADMIN]",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{TOKEN_TYPE}} {{ACCESS_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"imdbId\": \"A123\",\n    \"title\": \"Casper\",\n    \"director\": \"Tom Hanks\",\n    \"year\": \"1998\",\n    \"poster\": \"poster_url\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{PELICULAS_SERVICE}}{{PELICULAS_PATH}}",
+							"host": [
+								"{{PELICULAS_SERVICE}}{{PELICULAS_PATH}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "PUT movie [ADMIN]",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{TOKEN_TYPE}} {{ACCESS_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"imdbId\": \"A123\",\n    \"title\": \"Casper El Fantasmita\",\n    \"director\": \"Tom Hanks\",\n    \"year\": \"1998\",\n    \"poster\": \"poster_url\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{PELICULAS_SERVICE}}{{PELICULAS_PATH}}/A123",
+							"host": [
+								"{{PELICULAS_SERVICE}}{{PELICULAS_PATH}}"
+							],
+							"path": [
+								"A123"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE movie [ADMIN]",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{TOKEN_TYPE}} {{ACCESS_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{PELICULAS_SERVICE}}{{PELICULAS_PATH}}}/A123",
+							"host": [
+								"{{PELICULAS_SERVICE}}{{PELICULAS_PATH}}}"
+							],
+							"path": [
+								"A123"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "usuarios-service (localhost:8087)",
+			"item": [
+				{
+					"name": "Actuator",
+					"item": [
+						{
+							"name": "Actuator Info",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{USUARIOS_SERVICE}}/actuator/info",
+									"host": [
+										"{{USUARIOS_SERVICE}}"
+									],
+									"path": [
+										"actuator",
+										"info"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Actuator Health",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{USUARIOS_SERVICE}}/actuator/health",
+									"host": [
+										"{{USUARIOS_SERVICE}}"
+									],
+									"path": [
+										"actuator",
+										"health"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Actuator Metrics",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{USUARIOS_SERVICE}}/actuator/metrics",
+									"host": [
+										"{{USUARIOS_SERVICE}}"
+									],
+									"path": [
+										"actuator",
+										"metrics"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Actuator Env",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{USUARIOS_SERVICE}}/actuator/env",
+									"host": [
+										"{{USUARIOS_SERVICE}}"
+									],
+									"path": [
+										"actuator",
+										"env"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Actuator Beans",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{USUARIOS_SERVICE}}/actuator/beans",
+									"host": [
+										"{{USUARIOS_SERVICE}}"
+									],
+									"path": [
+										"actuator",
+										"beans"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Actuator Mappings",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{USUARIOS_SERVICE}}/actuator/mappings",
+									"host": [
+										"{{USUARIOS_SERVICE}}"
+									],
+									"path": [
+										"actuator",
+										"mappings"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "mongo",
+					"item": [
+						{
+							"name": "GET all mongo users",
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{TOKEN_TYPE}} {{ACCESS_TOKEN}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{USUARIOS_SERVICE}}{{USUARIOS_PATH}}/me",
+									"host": [
+										"{{USUARIOS_SERVICE}}{{USUARIOS_PATH}}"
+									],
+									"path": [
+										"me"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "POST mongo user",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{TOKEN_TYPE}} {{ACCESS_TOKEN}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"avatar\": \"Bugsy\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{USUARIOS_SERVICE}}{{USUARIOS_PATH}}/me",
+									"host": [
+										"{{USUARIOS_SERVICE}}{{USUARIOS_PATH}}"
+									],
+									"path": [
+										"me"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "keycloak",
+					"item": [
+						{
+							"name": "GET all keycloak users except admins [ADMIN]",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{TOKEN_TYPE}} {{ACCESS_TOKEN}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{USUARIOS_SERVICE}}{{USUARIOS_PATH}}/admin/",
+									"host": [
+										"{{USUARIOS_SERVICE}}{{USUARIOS_PATH}}"
+									],
+									"path": [
+										"admin",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET all keycloak users  [ADMIN]",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{TOKEN_TYPE}} {{ACCESS_TOKEN}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{USUARIOS_SERVICE}}{{USUARIOS_PATH}}/admin/all",
+									"host": [
+										"{{USUARIOS_SERVICE}}{{USUARIOS_PATH}}"
+									],
+									"path": [
+										"admin",
+										"all"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET keycloak user by id  [ADMIN]",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{TOKEN_TYPE}} {{ACCESS_TOKEN}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{USUARIOS_SERVICE}}{{USUARIOS_PATH}}/admin/id/ebc3927a-69d6-4537-a02f-dc5dcf52132e",
+									"host": [
+										"{{USUARIOS_SERVICE}}{{USUARIOS_PATH}}"
+									],
+									"path": [
+										"admin",
+										"id",
+										"ebc3927a-69d6-4537-a02f-dc5dcf52132e"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET keycloak user by id (exception) [ADMIN]",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{TOKEN_TYPE}} {{ACCESS_TOKEN}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{USUARIOS_SERVICE}}{{USUARIOS_PATH}}/admin/id/111",
+									"host": [
+										"{{USUARIOS_SERVICE}}{{USUARIOS_PATH}}"
+									],
+									"path": [
+										"admin",
+										"id",
+										"111"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET keycloak user by username [CLIENT]",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{TOKEN_TYPE}} {{ACCESS_TOKEN}}",
+										"type": "text"
+									}
+								],
+								"url": {
+									"raw": "{{USUARIOS_SERVICE}}{{USUARIOS_PATH}}/username/useradmin",
+									"host": [
+										"{{USUARIOS_SERVICE}}{{USUARIOS_PATH}}"
+									],
+									"path": [
+										"username",
+										"useradmin"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "POST keycloak user [ADMIN]",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "{{TOKEN_TYPE}} {{ACCESS_TOKEN}}",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"username\": \"userfrompostman\",\n    \"firstname\": \"Usuario\",\n    \"lastname\": \"Postman\",\n    \"email\": \"userfrompostman@mail.com\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{USUARIOS_SERVICE}}{{USUARIOS_PATH}}/admin",
+									"host": [
+										"{{USUARIOS_SERVICE}}{{USUARIOS_PATH}}"
+									],
+									"path": [
+										"admin"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "facturacion-service (localhost:8088)",
+			"item": [
+				{
+					"name": "Actuator",
+					"item": [
+						{
+							"name": "Actuator Info",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{FACTURACION_SERVICE}}/actuator/info",
+									"host": [
+										"{{FACTURACION_SERVICE}}"
+									],
+									"path": [
+										"actuator",
+										"info"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Actuator Health",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{FACTURACION_SERVICE}}/actuator/health",
+									"host": [
+										"{{FACTURACION_SERVICE}}"
+									],
+									"path": [
+										"actuator",
+										"health"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Actuator Metrics",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{FACTURACION_SERVICE}}/actuator/metrics",
+									"host": [
+										"{{FACTURACION_SERVICE}}"
+									],
+									"path": [
+										"actuator",
+										"metrics"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Actuator Env",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{FACTURACION_SERVICE}}/actuator/env",
+									"host": [
+										"{{FACTURACION_SERVICE}}"
+									],
+									"path": [
+										"actuator",
+										"env"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Actuator Beans",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{FACTURACION_SERVICE}}/actuator/beans",
+									"host": [
+										"{{FACTURACION_SERVICE}}"
+									],
+									"path": [
+										"actuator",
+										"beans"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Actuator Mappings",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{FACTURACION_SERVICE}}/actuator/mappings",
+									"host": [
+										"{{FACTURACION_SERVICE}}"
+									],
+									"path": [
+										"actuator",
+										"mappings"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "GET all bills [AUTENTICADOS]",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{TOKEN_TYPE}} {{ACCESS_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{FACTURACION_SERVICE}}{{FACTURACION_PATH}}/all",
+							"host": [
+								"{{FACTURACION_SERVICE}}{{FACTURACION_PATH}}"
+							],
+							"path": [
+								"all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST bill [PROVIDER Y scope facturacion:gestion]",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{TOKEN_TYPE}} {{ACCESS_TOKEN}}",
+								"type": "text"
+							},
+							{
+								"key": "scope",
+								"value": "",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n        \"billingDate\": \"2022-11-16\",\n        \"customerBill\": \"ANITA\",\n        \"productBill\": \"courses/SpringBoot\",\n        \"totalPrice\": 1250.0\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{FACTURACION_SERVICE}}{{FACTURACION_PATH}}",
+							"host": [
+								"{{FACTURACION_SERVICE}}{{FACTURACION_PATH}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET bill by customer [AUTENTICADOS]",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{TOKEN_TYPE}} {{ACCESS_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n        \"idBill\": \"111\",\n        \"billingDate\": \"2022-11-12\",\n        \"customerBill\": \"Ana\",\n        \"productBill\": \"courses/Java\",\n        \"totalPrice\": 500.0\n    }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{FACTURACION_SERVICE}}{{FACTURACION_PATH}}/findBy?customer=userclient",
+							"host": [
+								"{{FACTURACION_SERVICE}}{{FACTURACION_PATH}}"
+							],
+							"path": [
+								"findBy"
+							],
+							"query": [
+								{
+									"key": "customer",
+									"value": "userclient"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "[Feign] GET all bills by username + user details [CLIENT]",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{TOKEN_TYPE}} {{ACCESS_TOKEN}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{FACTURACION_SERVICE}}{{FACTURACION_PATH}}/detail/userclient",
+							"host": [
+								"{{FACTURACION_SERVICE}}{{FACTURACION_PATH}}"
+							],
+							"path": [
+								"detail",
+								"userclient"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "REALM",
+			"value": "http://localhost:8082/realms/DigitalMedia",
+			"type": "string"
+		},
+		{
+			"key": "TOKEN_ENDPOINT",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "AUTHORIZATION_ENDPOINT",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "TOKEN_INSTROSPECTION_ENDPOINT",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "USER_INFO_ENDPOINT",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "GATEWAY_SERVICE",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "PELICULAS_SERVICE",
+			"value": "http://localhost:8086",
+			"type": "string"
+		},
+		{
+			"key": "PELICULAS_PATH",
+			"value": "/movies",
+			"type": "string"
+		},
+		{
+			"key": "USUARIOS_SERVICE",
+			"value": "http://localhost:8087",
+			"type": "string"
+		},
+		{
+			"key": "USUARIOS_PATH",
+			"value": "/users",
+			"type": "string"
+		},
+		{
+			"key": "FACTURACION_SERVICE",
+			"value": "http://localhost:8088",
+			"type": "string"
+		},
+		{
+			"key": "FACTURACION_PATH",
+			"value": "/bills",
+			"type": "string"
+		},
+		{
+			"key": "CODE",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "ACCESS_TOKEN",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "ID_TOKEN",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "REFRESH_TOKEN",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "TOKEN_TYPE",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "REDIRECT_URI",
+			"value": "/login/oauth2/code/keycloak",
+			"type": "string"
+		},
+		{
+			"key": "CLIENT_ID",
+			"value": "internal",
+			"type": "string"
+		},
+		{
+			"key": "CLIENT_SECRET_GATEWAY",
+			"value": "4zBdFyVh83njKccG03JAo37nSUawgDd6",
+			"type": "string"
+		},
+		{
+			"key": "CLIENT_SECRET_INTERNAL",
+			"value": "n6zj3uohT8GweySdOdyx8I34x7Ktvm1W",
+			"type": "string"
+		},
+		{
+			"key": "CLIENT_SECRET_MICROSERVICIOS",
+			"value": "2zjJjakYyx6WrLT4hxSZLnutBwk9M6Ci",
+			"type": "string"
+		},
+		{
+			"key": "USERNAME",
+			"value": "userclient",
+			"type": "string"
+		},
+		{
+			"key": "PASSWORD",
+			"value": "userclient",
+			"type": "string"
+		}
+	]
+}
